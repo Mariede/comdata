@@ -26,8 +26,8 @@ BEGIN
 /*
 	- Preenche calendario (COMDATA_EVENTOS)
 */
-	SET NOCOUNT ON;
-	SET XACT_ABORT ON;
+	Set NOCOUNT On;
+	Set XACT_ABORT On;
 
 	Begin Try
 
@@ -63,7 +63,7 @@ BEGIN
 				COMDATA_EVENTOS.EVENTOS_ANO EA
 			Where
 				EA.ANO = @in_ano
-		) is Not Null
+		) is not Null
 		Begin
 			-- Passo 4 Limpa Calendario para o ano solicitado
 			Delete From
@@ -112,18 +112,9 @@ BEGIN
 			-- -----------------------------------------------------------------------------
 			-- Passo 6: Preenche tabela de eventos
 
-			-- CONFRATERNIZACAO UNIVERSAL
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				1
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/01/01', 111)
-			);
-
-			-- CARNAVAL
-			Insert Into @EVENTOS (
+			-- FERIADOS VARIAVEIS
+			-- DEPENDEM DE ID_DETALHE NA TABELA
+			Insert Into @EVENTOS ( -- CARNAVAL
 				ID_DETALHE
 				,DATA_EXTENSO
 			)
@@ -132,8 +123,7 @@ BEGIN
 				,DateAdd(dd, -47, @pascoa)
 			);
 
-			-- QUARTA-FEIRA DE CINZAS
-			Insert Into @EVENTOS (
+			Insert Into @EVENTOS ( -- QUARTA-FEIRA DE CINZAS
 				ID_DETALHE
 				,DATA_EXTENSO
 			)
@@ -142,8 +132,7 @@ BEGIN
 				,DateAdd(dd, -46, @pascoa)
 			);
 
-			-- SEXTA-FEIRA SANTA (PAIXAO DE CRISTO)
-			Insert Into @EVENTOS (
+			Insert Into @EVENTOS ( -- SEXTA-FEIRA SANTA (PAIXAO DE CRISTO)
 				ID_DETALHE
 				,DATA_EXTENSO
 			)
@@ -152,8 +141,7 @@ BEGIN
 				,DateAdd(dd, -2, @pascoa)
 			);
 
-			-- PASCOA
-			Insert Into @EVENTOS (
+			Insert Into @EVENTOS ( -- PASCOA
 				ID_DETALHE
 				,DATA_EXTENSO
 			)
@@ -162,28 +150,7 @@ BEGIN
 				,DateAdd(dd, 0, @pascoa)
 			);
 
-			-- TIRADENTES
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				6
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/04/21', 111)
-			);
-
-			-- TRABALHO
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				7
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/05/01', 111)
-			);
-
-			-- CORPUS CHRISTI
-			Insert Into @EVENTOS (
+			Insert Into @EVENTOS ( -- CORPUS CHRISTI
 				ID_DETALHE
 				,DATA_EXTENSO
 			)
@@ -192,115 +159,20 @@ BEGIN
 				,DateAdd(dd, 60, @pascoa)
 			);
 
-			-- REVOLUCAO CONSTITUCIONALISTA
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				9
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/07/09', 111)
-			);
 
-			-- ANIVERSARIO DE SOROCABA
+			-- FERIADOS FIXOS
+			-- NAO DEPENDEM DE ID_DETALHE NA TABELA (BASE E MES_DIA)
 			Insert Into @EVENTOS (
 				ID_DETALHE
 				,DATA_EXTENSO
 			)
-			Values (
-				10
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/08/15', 111)
-			);
-
-			-- INDEPENDENCIA DO BRASIL
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				11
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/09/07', 111)
-			);
-
-			-- NOSSA SENHORA APARECIDA
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				12
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/10/12', 111)
-			);
-
-			-- DIA DO FUNCIONARIO PUBLICO
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				13
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/10/28', 111)
-			);
-
-			-- FINADOS
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				14
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/11/02', 111)
-			);
-
-			-- PROCLAMACAO DA REPUBLICA
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				15
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/11/15', 111)
-			);
-
-			-- CONSCIENCIA NEGRA
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				16
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/11/20', 111)
-			);
-
-			-- VESPERA DE NATAL
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				17
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/12/24', 111)
-			);
-
-			-- NATAL
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				18
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/12/25', 111)
-			);
-
-			-- VESPERA ANO NOVO
-			Insert Into @EVENTOS (
-				ID_DETALHE
-				,DATA_EXTENSO
-			)
-			Values (
-				19
-				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/12/31', 111)
-			);
+			Select
+				ED.ID_DETALHE
+				,Convert(datetime, Cast(@in_ano as varchar(4)) + '/' + ED.MES_DIA, 111)
+			From
+				COMDATA_EVENTOS.EVENTOS_DETALHE ED
+			Where
+				ED.MES_DIA is not Null;
 			-- -----------------------------------------------------------------------------
 			-- -----------------------------------------------------------------------------
 
@@ -352,7 +224,7 @@ BEGIN
 				@EVENTOS EV_EM1
 			Where (
 				Datepart(dw, EV_EM1.DATA_EXTENSO) = 3	-- Terca
-				And Not Exists (
+				And not Exists (
 					Select
 						*
 					From
@@ -364,7 +236,7 @@ BEGIN
 			Or
 			(
 				Datepart(dw, EV_EM1.DATA_EXTENSO) = 5	-- Quinta
-				And Not Exists (
+				And not Exists (
 					Select
 						*
 					From
@@ -388,10 +260,10 @@ BEGIN
 			Select
 				Cast (
 					Cast(Datepart(year, EM.DATA_EMENDA) as varchar(4))
-					+ '20'
+					+ '9999'
 					+ Cast(EM.ID_EMENDAS_UNICO as varchar(6)) as varchar(20)
 				)
-				,20
+				,9999
 				,Datepart(dw, EM.DATA_EMENDA)
 				,Datepart(year, EM.DATA_EMENDA)
 				,Datepart(month, EM.DATA_EMENDA)
